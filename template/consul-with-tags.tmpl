@@ -1,0 +1,38 @@
+global
+    maxconn {{key_or_default "service/haproxy/maxconn" "256"}}
+    debug
+
+defaults
+    mode http
+    timeout connect {{key_or_default "service/haproxy/timeouts/connect" "5000ms"}}
+    timeout client {{key_or_default "service/haproxy/timeouts/client" "50000ms"}}
+    timeout server {{key_or_default "service/haproxy/timeouts/server" "50000ms"}}
+
+frontend www
+    bind :80
+
+    # Generated automatically by consul-template
+# HTTP_SERVICE
+{{ range services }}{{ if .Tags | contains "HTTP_SERVICE" }}
+    acl host_{{ .Name }} hdr(host) -i {{ .Name }}.{{ or (env "HAPROXY_DOMAIN") "haproxy.service.consul" }} 
+    use_backend {{ .Name }}_backend if host_{{ .Name }}
+{{ end }}{{ end }}
+
+{{ range services }}{{ if .Tags | contains "HTTP_SERVICE" }}
+backend {{ .Name }}_backend
+  {{ range service .Name }}
+   server {{ .Node }} {{ .Address }}:{{ .Port }}{{ end }}
+{{ end }}{{ end }}
+
+# TCP_SERVICE
+
+{{range services}}{{range $tag, $services := service .Name | byTag}}{{$service := (index $services 0)}}{{if (eq $tag "TCP_SERVICE")}}{{range $service.Tags}}{{if . | regexMatch "proxy_tcp_port=([0-9]+)" }}{{$tcp_port := . | regexReplaceAll "proxy_tcp_port=" ""}}
+# TCP forwarding service: {{$service.Name}}:{{$tcp_port}}
+listen tcp_{{$service.Name}}
+    bind :{{$tcp_port}}
+    mode    tcp
+    option  tcplog
+    balance roundrobin
+{{range $services}}    server  {{.Node}}_{{.Port}} {{.Address}}:{{.Port}} check
+{{end}}{{end}}
+{{end}}{{end}}{{end}}{{end}}
