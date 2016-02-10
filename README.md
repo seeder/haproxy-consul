@@ -50,6 +50,20 @@ haproxy-consul can run in two different modes: forwarding either consul services
 When `HAPROXY_MODE` is set to `consul`, haproxy-consul uses consul service names
 to set subdomains. No other configuration is required.
 
+#### consul-with-tags Configuration
+
+When `HAPROXY_MODE` is set to `consul-with-tagsl`, haproxy-consul uses consul service names
+to set subdomains.
+
+You are require to tag services as either `HTTP_SERVICE` or `TCP_SERVICE` , otherwise
+they will not be proxies.
+
+`TCP_SERVICE` requires additional tag with the port you want to have proxy from
+
+Tag is `proxy_tcp_port=PORT_NUMBER`
+
+
+
 #### Marathon Configuration
 
 When `HAPROXY_MODE` is set to `marathon`, haproxy-consul assumes that there will
@@ -188,7 +202,7 @@ Variable | Description | Default
 `CONSUL_CONNECT`  | The consul connection | `consul.service.consul:8500`
 `CONSUL_CONFIG`   | File/directory for consul-template config | `/consul-template/config.d`
 `CONSUL_LOGLEVEL` | Valid values are "debug", "info", "warn", and "err". | `debug`
-`CONSUL_TOKEN`    | The [Consul API token](http://www.consul.io/docs/internals/acl.html) | 
+`CONSUL_TOKEN`    | The [Consul API token](http://www.consul.io/docs/internals/acl.html) |
 
 consul KV variables:
 
