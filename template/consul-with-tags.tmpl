@@ -7,6 +7,8 @@ defaults
     timeout connect {{key_or_default "service/haproxy/timeouts/connect" "5000ms"}}
     timeout client {{key_or_default "service/haproxy/timeouts/client" "50000ms"}}
     timeout server {{key_or_default "service/haproxy/timeouts/server" "50000ms"}}
+    stats enable
+    stats uri /hrg-private/haproxy/stats
 
 frontend www
     bind :80
