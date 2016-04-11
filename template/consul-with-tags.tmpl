@@ -23,7 +23,7 @@ frontend www
 {{ range services }}{{ if .Tags | contains "HTTP_SERVICE" }}
 backend {{ .Name }}_backend
   {{ range service .Name }}
-   server {{ .Node }} {{ .Address }}:{{ .Port }}{{ end }}
+   server {{ .Node }}_{{ .Port }} {{ .Address }}:{{ .Port }}{{ end }}
 {{ end }}{{ end }}
 
 # TCP_SERVICE
